@@ -1,0 +1,23 @@
+# Binaries
+/build
+/dist
+
+# Go specific
+/bin
+/pkg
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Editor/IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
