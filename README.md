@@ -24,3 +24,11 @@ I'm tried of *fake* opensourced collaboration apps.
 - [ ] OAuth2 support
 - [ ] SAML / OIDC support
 - [ ] LDAP support
+
+
+# About the License
+
+DON'T BE SCARED OF AGPL
+
+I don't want my code (or maybe *our code* if you contribute) to be stolen by some random company.
+<br/>Except for that, I'd love to see any modification/contribution for this project :)<br/>
