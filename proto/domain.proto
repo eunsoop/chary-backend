@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package chary.domain;
+
+option go_package = "chary/pkg/proto/domainpb";
+
+import "google/protobuf/timestamp.proto";
+
+// Workspace enforces top-level multi-tenant boundaries.
+message Workspace {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+// GlobalScope represents enterprise-wide configurations and boundaries, isolated via deterministic UUIDv5.
+message GlobalScope {
+  string id = 1;
+  string workspace_id = 2;
+  string domain = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// TeamScope is dynamically created for targeted departments or short-term task forces, isolated via UUIDv7.
+message TeamScope {
+  string id = 1;
+  string workspace_id = 2;
+  string name = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// Category represents a structural grouping layer mapping to either Global or Team scopes.
+message Category {
+  string id = 1;
+  string scope_id = 2;
+  string scope_type = 3; // "GLOBAL" or "TEAM"
+  string name = 4;
+  int32 order = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Channel represents the leaf container handling target baseline boundaries for WebSockets.
+message Channel {
+  string id = 1;
+  string category_id = 2;
+  string name = 3;
+  bool is_private = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// Integration represents a channel-level extension (like webhooks).
+message Integration {
+  string id = 1;
+  string channel_id = 2;
+  string name = 3;
+  string type = 4; // e.g. "WEBHOOK"
+  bool is_enabled = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Webhook provides incoming or outgoing HTTP callback capability linked to an integration.
+message Webhook {
+  string id = 1;
+  string integration_id = 2;
+  string type = 3; // "INCOMING" or "OUTGOING"
+  string secret_token = 4; // Used for Incoming
+  string target_url = 5; // Used for Outgoing
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Message implements envelope-encrypted content using AES-256-GCM.
+message Message {
+  string id = 1;
+  string channel_id = 2;
+  string sender_id = 3;
+  string encrypted_content = 4;
+  string encrypted_dek = 5;
+  optional string thread_id = 6; // Present if message is a reply inside a thread.
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// Thread contains child messages and is fully symmetrical across Global and Team scopes.
+message Thread {
+  string id = 1;
+  string parent_message_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+// Expression is a unified reaction entity mapping to both root and thread messages seamlessly.
+message Expression {
+  string id = 1;
+  string message_id = 2;
+  string user_id = 3;
+  string emoji_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// Role represents workspace authorization metadata mapped to Global or Team scopes.
+message Role {
+  string id = 1;
+  string scope_id = 2;
+  string scope_type = 3; // "GLOBAL" or "TEAM"
+  string name = 4;
+  string color = 5;
+  string permissions = 6;
+  int32 order = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+// CustomEmoji represents scope-isolated emojis.
+message CustomEmoji {
+  string id = 1;
+  string scope_id = 2;
+  string scope_type = 3; // "GLOBAL" or "TEAM"
+  string name = 4;
+  string image_url = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// Tag represents team-specific metadata labels.
+message Tag {
+  string id = 1;
+  string team_scope_id = 2;
+  string name = 3;
+  string color = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// PermissionList wraps repeated uint64 blocks for map serialization.
+message PermissionList {
+  repeated uint64 bits = 1;
+}
+
+// User represents the platform's user/app entity, featuring the scope permissions matrix map.
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string display_name = 4;
+  string avatar_url = 5;
+  bool is_app = 6;
+  map<string, PermissionList> scope_map = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+// ProviderType specifies auth realms including centralized federation.
+enum ProviderType {
+  PROVIDER_LOCAL = 0;
+  PROVIDER_OIDC = 1;
+  PROVIDER_SAML = 2;
+  PROVIDER_LDAP = 3;
+}
+
+// UserCredential holds authentication realms mapped to a user.
+message UserCredential {
+  string id = 1;
+  string user_id = 2;
+  ProviderType provider = 3;
+  string provider_key = 4; // Unique key (e.g. Email, SAML NameID, LDAP Distinguished Name / DN)
+  string password_hash = 5; // Present only for local provider
+  google.protobuf.Timestamp created_at = 6;
+}
+
+
+

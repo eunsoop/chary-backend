@@ -19,7 +19,7 @@ I'm tried of *fake* opensourced collaboration apps.
 - [ ] Audio/Video call support
 - [ ] S3 support
 - [ ] Websocket support
-- [ ] Bot support
+- [ ] App support
 - [ ] MFA / 2FA support
 - [ ] OAuth2 support
 - [ ] SAML / OIDC support
